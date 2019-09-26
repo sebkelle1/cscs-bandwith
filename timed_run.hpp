@@ -57,6 +57,7 @@ public:
     Buffer& operator=(Buffer&& rhs) {
         data_ = std::move(rhs.data_);
         data_size = rhs.data_size;
+        return *this;
     }
 
     void* get() const { return data_.get(); }

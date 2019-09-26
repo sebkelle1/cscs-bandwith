@@ -1,4 +1,4 @@
-CXXFLAGS= -O3 -mavx2 -fno-dce
+CXXFLAGS= -std=c++11 -O3 -mavx2 -fno-dce
 #cc=gcc
 CXX=g++
 SRC=main.cpp
