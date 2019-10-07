@@ -41,7 +41,8 @@ int get_affinity(std::thread& t)
 int main(int argc, char ** argv)
 {
     size_t s = std::stoi(argv[1]);
-    size_t nthreads = std::stoi(argv[2]);
+    int stride = std::stoi(argv[2]);
+    int nthreads = std::stoi(argv[3]);
 
     double time_per_run = 2.0;
 
@@ -59,12 +60,12 @@ int main(int argc, char ** argv)
         t.join();
     }
 
-    std::function<void(size_t)> func = std::bind(&read_AVX, buf[0].get(), s, std::placeholders::_1);
+    std::function<void(size_t)> func = std::bind(&read_stride, buf[0].get(), s, std::placeholders::_1, stride);
     size_t loops = determine_loops(func, time_per_run);
 
     std::vector<std::function<void()>> tasks(nthreads);
     for (int i = 0; i < nthreads; ++i)
-        tasks[i] = std::bind(&read_AVX, buf[i].get(), s, loops);
+        tasks[i] = std::bind(&read_stride, buf[i].get(), s, loops, stride);
 
     std::vector<std::thread> workers(nthreads);
     auto t0 = std::chrono::high_resolution_clock::now();
@@ -82,6 +83,6 @@ int main(int argc, char ** argv)
     double time = elapsed.count();
 
     std::cout << s/1024 << "K: "
-              << (nthreads*s*loops)/(1024*1024*1024) / time
+              << (double(nthreads*s*loops)/stride)/(1024*1024*1024) / time
               << " GB/s" << " in " << time << "s" << std::endl;
 }
